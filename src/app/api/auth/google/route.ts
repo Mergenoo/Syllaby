@@ -56,7 +56,6 @@ export async function GET(
       const data = await response.json();
       return NextResponse.json(data);
     } else if (type === "calendars") {
-      // Get user's calendars
       const response = await fetch(
         buildApiUrl(backendUrl, `api/auth/google/calendars?user_id=${userId}`)
       );

@@ -111,7 +111,7 @@ export default function GoogleCalendarIntegration({
       }
 
       // Get OAuth URL
-      const response = await fetch("/api/auth/google/url");
+      const response = await fetch(`/api/auth/google?type=auth-url&user_id=${user.id}`);
       if (!response.ok) {
         throw new Error("Failed to get OAuth URL");
       }
