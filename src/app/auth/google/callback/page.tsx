@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
-function GoogleCallbackContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+// Helper function to ensure proper URL construction
+const buildApiUrl = (baseUrl: string, endpoint: string): string => {
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  return `${cleanBaseUrl}/${cleanEndpoint}`;
+};
+
+export default function GoogleCallback() {
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
-  const [message, setMessage] = useState(
-    "Processing Google Calendar connection..."
-  );
+  const [message, setMessage] = useState("Processing...");
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -20,22 +25,18 @@ function GoogleCallbackContent() {
         const code = searchParams.get("code");
         const error = searchParams.get("error");
 
-        console.log("Full authorization code:", code); // Debug log
-        console.log("Code length:", code?.length); // Debug log
-
         if (error) {
           setStatus("error");
-          setMessage("Google Calendar connection was cancelled or failed.");
+          setMessage(`OAuth error: ${error}`);
           return;
         }
 
         if (!code) {
           setStatus("error");
-          setMessage("Missing authorization code.");
+          setMessage("No authorization code received.");
           return;
         }
 
-        // Get user ID from Supabase
         const supabase = createClient();
         const {
           data: { user },
@@ -52,7 +53,10 @@ function GoogleCallbackContent() {
           process.env.NEXT_PUBLIC_BACKEND_URL ||
           "https://law-bandit-back.vercel.app";
         const response = await fetch(
-          `${backendUrl}/api/auth/google/callback?code=${code}&state=${user.id}`
+          buildApiUrl(
+            backendUrl,
+            `api/auth/google/callback?code=${code}&state=${user.id}`
+          )
         );
 
         if (!response.ok) {
@@ -145,19 +149,5 @@ function GoogleCallbackContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function GoogleAuthCallback() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-        </div>
-      }
-    >
-      <GoogleCallbackContent />
-    </Suspense>
   );
 }
