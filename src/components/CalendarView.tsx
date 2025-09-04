@@ -11,7 +11,11 @@ interface CalendarDay {
   isCurrentMonth: boolean;
 }
 
-export default function CalendarView() {
+interface CalendarViewProps {
+  classId?: string;
+}
+
+export default function CalendarView({ classId }: CalendarViewProps) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
@@ -35,13 +39,20 @@ export default function CalendarView() {
           0
         );
 
-        const { data: eventsData, error } = await supabase
+        let query = supabase
           .from("calendar_events")
           .select("*")
           .eq("user_id", userId)
           .gte("due_date", firstDay.toISOString().split("T")[0])
           .lte("due_date", lastDay.toISOString().split("T")[0])
           .order("due_date", { ascending: true });
+
+        // If classId is provided, filter by class_id
+        if (classId) {
+          query = query.eq("class_id", classId);
+        }
+
+        const { data: eventsData, error } = await query;
 
         if (error) {
           console.error("Error fetching events:", error);
@@ -53,7 +64,7 @@ export default function CalendarView() {
         console.error("Error fetching events:", error);
       }
     },
-    [currentDate, supabase]
+    [currentDate, supabase, classId]
   );
 
   useEffect(() => {
@@ -74,7 +85,6 @@ export default function CalendarView() {
     const month = currentDate.getMonth();
 
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
 
@@ -203,94 +213,115 @@ export default function CalendarView() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg">
-        {/* Calendar Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h1 className="text-2xl font-bold text-gray-800">Calendar</h1>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={previousMonth}
-              className="p-2 hover:bg-gray-100 rounded-lg"
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      {/* Calendar Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={previousMonth}
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              ←
-            </button>
-            <button
-              onClick={goToToday}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={goToToday}
+            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Today
+          </button>
+          <button
+            onClick={nextMonth}
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              Today
-            </button>
-            <button
-              onClick={nextMonth}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              →
-            </button>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-700">
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </h2>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
+      </div>
 
-        {/* Calendar Grid */}
-        <div className="p-6">
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div
-                key={day}
-                className="text-center font-semibold text-gray-600 py-2"
-              >
-                {day}
-              </div>
-            ))}
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden">
+        {/* Day Headers */}
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+          <div key={day} className="bg-gray-50 p-3 text-center">
+            <div className="text-sm font-medium text-gray-500">{day}</div>
           </div>
+        ))}
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((day, index) => (
-              <div
-                key={index}
-                className={`min-h-[120px] border border-gray-200 p-2 ${
-                  day.isToday ? "bg-blue-50 border-blue-300" : ""
-                } ${!day.isCurrentMonth ? "bg-gray-50 text-gray-400" : ""}`}
-              >
-                <div className="text-sm font-medium mb-1">
-                  {day.date.getDate()}
+        {/* Calendar Days */}
+        {calendarDays.map((day, index) => (
+          <div
+            key={index}
+            className={`min-h-[120px] bg-white p-2 ${
+              !day.isCurrentMonth ? "text-gray-300" : "text-gray-900"
+            }`}
+          >
+            <div
+              className={`text-sm font-medium mb-1 ${
+                day.isToday
+                  ? "bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                  : ""
+              }`}
+            >
+              {day.date.getDate()}
+            </div>
+
+            {/* Events for this day */}
+            <div className="space-y-1">
+              {day.events.slice(0, 2).map((event) => (
+                <div
+                  key={event.id}
+                  className={`text-xs p-1 rounded truncate cursor-pointer hover:opacity-80 transition-opacity ${
+                    event.event_type === "assignment"
+                      ? "bg-blue-100 text-blue-800"
+                      : event.event_type === "exam"
+                      ? "bg-red-100 text-red-800"
+                      : event.event_type === "reading"
+                      ? "bg-green-100 text-green-800"
+                      : event.event_type === "google_calendar"
+                      ? "bg-indigo-100 text-indigo-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                  title={event.title}
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  {event.title}
                 </div>
-                <div className="space-y-1">
-                  {day.events.slice(0, 3).map((event) => (
-                    <div
-                      key={event.id}
-                      onClick={() => setSelectedEvent(event)}
-                      className={`text-xs p-1 rounded cursor-pointer text-white ${getEventTypeColor(
-                        event.event_type
-                      )}`}
-                      title={`${event.title}${
-                        event.due_time
-                          ? ` at ${formatTime(event.due_time)}`
-                          : ""
-                      }`}
-                    >
-                      <div className="font-medium truncate">
-                        {getEventTypeLabel(event.event_type)}
-                      </div>
-                      <div className="truncate text-xs opacity-90">
-                        {event.title}
-                      </div>
-                    </div>
-                  ))}
-                  {day.events.length > 3 && (
-                    <div className="text-xs text-gray-500 text-center">
-                      +{day.events.length - 3} more
-                    </div>
-                  )}
+              ))}
+              {day.events.length > 2 && (
+                <div className="text-xs text-gray-500">
+                  +{day.events.length - 2} more
                 </div>
-              </div>
-            ))}
+              )}
+            </div>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Event Details Modal */}
@@ -352,29 +383,6 @@ export default function CalendarView() {
           </div>
         </div>
       )}
-
-      {/* Legend */}
-      <div className="mt-6 bg-white rounded-lg shadow p-4">
-        <h3 className="font-semibold mb-3">Event Types</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          {[
-            { type: "assignment", label: "Assignment" },
-            { type: "exam", label: "Exam" },
-            { type: "quiz", label: "Quiz" },
-            { type: "project", label: "Project" },
-            { type: "reading", label: "Reading" },
-            { type: "deadline", label: "Deadline" },
-            { type: "google_calendar", label: "Google Calendar" },
-          ].map(({ type, label }) => (
-            <div key={type} className="flex items-center space-x-2">
-              <div
-                className={`w-3 h-3 rounded ${getEventTypeColor(type)}`}
-              ></div>
-              <span className="text-sm">{label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
