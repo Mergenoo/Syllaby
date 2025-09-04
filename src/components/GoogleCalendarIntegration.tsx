@@ -51,7 +51,6 @@ export default function GoogleCalendarIntegration({
           const status = await response.json();
           setIsConnected(status.connected);
 
-          // If connected, get user email
           if (status.connected) {
             const { data: tokenData } = await supabase
               .from("google_calendar_tokens")
@@ -111,7 +110,9 @@ export default function GoogleCalendarIntegration({
       }
 
       // Get OAuth URL
-      const response = await fetch(`/api/auth/google?type=auth-url&user_id=${user.id}`);
+      const response = await fetch(
+        `/api/auth/google?type=auth-url&user_id=${user.id}`
+      );
       if (!response.ok) {
         throw new Error("Failed to get OAuth URL");
       }
@@ -162,40 +163,7 @@ export default function GoogleCalendarIntegration({
     setSuccess(null);
 
     if (isConnected) {
-      await loadCalendars();
-    }
-  };
-
-  const loadCalendars = async () => {
-    if (!user) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(
-        `/api/auth/google?type=calendars&user_id=${user.id}`
-      );
-      const data = await response.json();
-
-      if (response.ok) {
-        setCalendars(data.calendars);
-        if (data.calendars.length > 0) {
-          const primaryCalendar = data.calendars.find(
-            (cal: { primary?: boolean }) => cal.primary
-          );
-          setSelectedCalendarId(
-            primaryCalendar ? primaryCalendar.id : data.calendars[0].id
-          );
-        }
-      } else {
-        setError(data.error || "Failed to load calendars");
-      }
-    } catch (error) {
-      setError("Failed to load calendars");
-      console.error("Error loading calendars:", error);
-    } finally {
-      setLoading(false);
+      await syncEvents();
     }
   };
 
@@ -229,55 +197,43 @@ export default function GoogleCalendarIntegration({
     }
   };
 
-  const importEvents = async () => {
-    if (!selectedCalendarId || googleEvents.length === 0 || !user) return;
+  const syncEvents = async (options = {}) => {
+    if (!user) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      const eventsToImport = googleEvents.map((event) => ({
-        title: event.summary,
-        description: event.description || "",
-        due_date: event.start.dateTime
-          ? new Date(event.start.dateTime).toISOString().split("T")[0]
-          : event.start.date,
-        due_time: event.start.dateTime
-          ? new Date(event.start.dateTime).toTimeString().split(" ")[0]
-          : null,
-        event_type: "other",
-        class_id: classId === "global" ? null : classId,
-        source_text: `Imported from Google Calendar: ${event.summary}`,
-        extraction_method: "google_calendar_import",
-      }));
-
-      const response = await fetch("/api/calendar/import-from-google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          events: eventsToImport,
-          classId: classId === "global" ? null : classId,
-        }),
-      });
+      const response = await fetch(
+        `/api/google-calendar/sync-events/${user.id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(options),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to import events");
+        throw new Error(errorData.error || "Failed to sync events");
       }
 
       const result = await response.json();
       setSuccess(
-        `Successfully imported ${result.importedCount} events from Google Calendar!`
+        `Successfully synced events from Google Calendar! ${
+          result.message || ""
+        }`
       );
 
+      // Refresh the page after successful sync
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : "Failed to import events"
+        error instanceof Error ? error.message : "Failed to sync events"
       );
-      console.error("Error importing events:", error);
+      console.error("Error syncing events:", error);
     } finally {
       setLoading(false);
     }
@@ -429,6 +385,22 @@ export default function GoogleCalendarIntegration({
                   ) : (
                     <p className="text-gray-600">No Google Calendars found.</p>
                   )}
+
+                  {/* Quick Sync Button */}
+                  {calendars.length > 0 && (
+                    <button
+                      onClick={() =>
+                        syncEvents({
+                          calendarId: selectedCalendarId || calendars[0]?.id,
+                          syncAll: true,
+                        })
+                      }
+                      disabled={loading}
+                      className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {loading ? "Syncing..." : "Quick Sync All Events"}
+                    </button>
+                  )}
                 </div>
 
                 {/* Step 2: Review Events */}
@@ -460,13 +432,13 @@ export default function GoogleCalendarIntegration({
                       ))}
                     </div>
                     <button
-                      onClick={importEvents}
+                      onClick={() =>
+                        syncEvents({ calendarId: selectedCalendarId })
+                      }
                       disabled={loading}
-                      className="mt-3 w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                      {loading
-                        ? "Importing..."
-                        : `Import ${googleEvents.length} Events`}
+                      {loading ? "Syncing..." : "Sync Events"}
                     </button>
                   </div>
                 )}
