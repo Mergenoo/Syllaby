@@ -52,7 +52,7 @@ export async function POST(
     }
 
     const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+      process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     const response = await fetch(
       `${backendUrl}/api/calendar/import-from-google`,
       {

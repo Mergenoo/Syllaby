@@ -25,7 +25,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
 
     const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+      process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
 
     if (type === "auth-url") {
       // Get OAuth URL
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+      process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     const response = await fetch(`${backendUrl}/api/auth/google/add-event`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

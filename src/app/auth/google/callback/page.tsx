@@ -49,7 +49,8 @@ function GoogleCallbackContent() {
 
         // Call backend to exchange code for tokens
         const backendUrl =
-          process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+          process.env.NEXT_PUBLIC_BACKEND_URL ||
+          "https://law-bandit-back.vercel.app";
         const response = await fetch(
           `${backendUrl}/api/auth/google/callback?code=${code}&state=${user.id}`
         );

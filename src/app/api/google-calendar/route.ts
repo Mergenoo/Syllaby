@@ -36,7 +36,7 @@ export async function POST(
     }
 
     const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+      process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     const response = await fetch(
       `${backendUrl}/api/google-calendar/add-to-google-calendar`,
       {
@@ -91,7 +91,7 @@ export async function GET(
     const endDate = searchParams.get("endDate");
 
     const backendUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+      process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     let endpoint = "";
 
     if (type === "calendars") {

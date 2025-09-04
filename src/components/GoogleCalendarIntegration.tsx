@@ -11,7 +11,7 @@ export default function GoogleCalendarIntegration() {
 
   const supabase = createClient();
   const backendUrl =
-    process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+    process.env.NEXT_PUBLIC_BACKEND_URL || "https://law-bandit-back.vercel.app";
 
   // Get current user on component mount
   useEffect(() => {
