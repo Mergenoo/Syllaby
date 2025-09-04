@@ -12,7 +12,6 @@ interface UploadNewSyllabiProps {
 const uploadSyllabi = async (file: File, classId: string) => {
   const supabase = createClient();
 
-  // Check authentication
   const {
     data: { user },
     error: authError,
@@ -21,16 +20,10 @@ const uploadSyllabi = async (file: File, classId: string) => {
     throw new Error("User not authenticated");
   }
 
-  console.log("🚀 Starting complete syllabus processing workflow...");
-
-  // Step 1: Extract text from PDF
   let contentText = null;
   if (file.type === "application/pdf") {
     try {
-      console.log("📄 Extracting text from PDF...");
       contentText = await extractTextFromPDF(file);
-      console.log("✅ PDF text extraction completed");
-      console.log("📊 Extracted text length:", contentText.length);
     } catch (error) {
       console.error("❌ PDF text extraction failed:", error);
       throw new Error("Failed to extract text from PDF");
@@ -39,21 +32,15 @@ const uploadSyllabi = async (file: File, classId: string) => {
     throw new Error("Only PDF files are supported for automatic processing");
   }
 
-  // Step 2: Extract calendar events using the new API
-  console.log("🎯 Extracting calendar events from syllabus content...");
   let extractedEvents = null;
   try {
     const extractionResult = await extractCalendarEvents(contentText);
     extractedEvents = extractionResult.events;
-    console.log("✅ Calendar events extracted successfully");
-    console.log("📅 Extracted events count:", extractedEvents.length);
   } catch (error) {
     console.error("❌ Calendar event extraction failed:", error);
     throw new Error("Failed to extract calendar events from syllabus");
   }
 
-  // Step 3: Upload the file to Supabase Storage
-  console.log("📤 Uploading file to Supabase Storage...");
   const fileName = `${user.id}/${classId}/${Date.now()}_${file.name}`;
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from("syllabi")
@@ -63,10 +50,7 @@ const uploadSyllabi = async (file: File, classId: string) => {
     console.error("❌ Error uploading file:", uploadError);
     throw new Error("Error uploading file to storage");
   }
-  console.log("✅ File uploaded to storage successfully");
 
-  // Step 4: Create the syllabus record in the database
-  console.log("💾 Creating syllabus record in database...");
   const { data: syllabusData, error: syllabusError } = await supabase
     .from("syllabi")
     .insert({
@@ -86,12 +70,8 @@ const uploadSyllabi = async (file: File, classId: string) => {
     console.error("❌ Error creating syllabus record:", syllabusError);
     throw new Error("Error creating syllabus record");
   }
-  console.log("✅ Syllabus record created successfully");
 
-  // Step 5: Save extracted events to calendar_events table
   if (extractedEvents && extractedEvents.length > 0) {
-    console.log("💾 Saving extracted events to calendar_events table...");
-
     const eventsToInsert = extractedEvents.map((event) => ({
       syllabus_id: syllabusData.id,
       class_id: classId,
@@ -118,13 +98,9 @@ const uploadSyllabi = async (file: File, classId: string) => {
       console.error("❌ Error saving events to database:", eventsError);
       throw new Error("Failed to save calendar events to database");
     }
-    console.log("✅ Calendar events saved successfully");
-    console.log("📊 Saved events count:", insertedEvents?.length || 0);
   } else {
     console.log("⚠️ No calendar events found to save");
   }
-
-  console.log("🎉 Complete workflow finished successfully!");
 
   return {
     data: syllabusData,
@@ -163,10 +139,9 @@ export default function UploadNewSyllabi({
         `✅ Syllabus uploaded successfully! Extracted ${result.savedEvents} calendar events.`
       );
       setIsModalOpen(false);
-      // Optionally refresh the page or update the UI after a delay
       setTimeout(() => {
         setSuccessMessage(null);
-        window.location.reload(); // Refresh to show new syllabus and events
+        window.location.reload();
       }, 2000);
     } catch (error) {
       console.error("Upload error:", error);
@@ -246,7 +221,7 @@ export default function UploadNewSyllabi({
                   Supported formats: PDF (recommended for automatic processing)
                 </p>
                 <p className="mt-1 text-xs text-blue-600">
-                  📋 This will automatically extract text, generate calendar
+                  This will automatically extract text, generate calendar
                   events, and save them to your database.
                 </p>
               </div>

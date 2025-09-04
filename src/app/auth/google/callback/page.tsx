@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
-// Helper function to ensure proper URL construction
+
 const buildApiUrl = (baseUrl: string, endpoint: string): string => {
   const cleanBaseUrl = baseUrl.replace(/\/$/, "");
   const cleanEndpoint = endpoint.replace(/^\//, "");
@@ -48,7 +48,7 @@ function GoogleCallbackContent() {
           return;
         }
 
-        // Call backend to exchange code for tokens
+        
         const backendUrl =
           process.env.NEXT_PUBLIC_BACKEND_URL ||
           "https://law-bandit-back.vercel.app";
@@ -65,13 +65,12 @@ function GoogleCallbackContent() {
         }
 
         const result = await response.json();
-        console.log("Result:", result);
 
         if (result.success) {
           setStatus("success");
           setMessage("Google Calendar connected successfully!");
 
-          // Redirect to the URL provided by the backend
+         
           setTimeout(() => {
             window.location.href = result.redirectUrl;
           }, 2000);

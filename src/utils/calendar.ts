@@ -1,11 +1,5 @@
 import { CalendarEvent, ExtractedEvent } from "@/types/database";
 
-/**
- * Generate ICS calendar content from calendar events
- * @param events Array of calendar events
- * @param calendarName Name for the calendar
- * @returns ICS formatted string
- */
 export function generateICSContent(
   events: CalendarEvent[],
   calendarName: string = "Law Bandit Calendar"
@@ -26,16 +20,13 @@ export function generateICSContent(
     const eventId = `${calendarId}-event-${index}`;
     const startDate = new Date(event.due_date);
 
-    // Format date as YYYYMMDD
     const dateStr = startDate.toISOString().slice(0, 10).replace(/-/g, "");
 
-    // Format time if available (HHMMSS)
     let timeStr = "";
     if (event.due_time) {
       timeStr = event.due_time.replace(/:/g, "") + "00";
     }
 
-    // Create event entry
     ics.push(
       "BEGIN:VEVENT",
       `UID:${eventId}`,
@@ -53,11 +44,6 @@ export function generateICSContent(
   return ics.join("\r\n");
 }
 
-/**
- * Download ICS file
- * @param icsContent ICS calendar content
- * @param filename Filename for download
- */
 export function downloadICSFile(
   icsContent: string,
   filename: string = "calendar.ics"
@@ -75,14 +61,6 @@ export function downloadICSFile(
   URL.revokeObjectURL(url);
 }
 
-/**
- * Convert ExtractedEvent to CalendarEvent format
- * @param extractedEvent Extracted event from LLM
- * @param classId Class ID
- * @param userId User ID
- * @param syllabusId Syllabus ID (optional)
- * @returns CalendarEvent insert object
- */
 export function convertToCalendarEvent(
   extractedEvent: ExtractedEvent,
   classId: string,
@@ -107,12 +85,6 @@ export function convertToCalendarEvent(
   };
 }
 
-/**
- * Format date for display
- * @param dateString ISO date string
- * @param includeTime Whether to include time
- * @returns Formatted date string
- */
 export function formatDate(
   dateString: string,
   includeTime: boolean = false
@@ -133,11 +105,6 @@ export function formatDate(
   return date.toLocaleDateString("en-US", options);
 }
 
-/**
- * Get event type display name
- * @param eventType Event type
- * @returns Display name
- */
 export function getEventTypeDisplayName(eventType: string): string {
   const displayNames: Record<string, string> = {
     assignment: "Assignment",
@@ -150,32 +117,17 @@ export function getEventTypeDisplayName(eventType: string): string {
   return displayNames[eventType] || eventType;
 }
 
-/**
- * Get confidence score color
- * @param score Confidence score (0-1)
- * @returns Tailwind CSS color class
- */
 export function getConfidenceColor(score: number): string {
   if (score >= 0.8) return "text-green-600";
   if (score >= 0.6) return "text-yellow-600";
   return "text-red-600";
 }
 
-/**
- * Validate date string
- * @param dateString Date string to validate
- * @returns Whether date is valid
- */
 export function isValidDate(dateString: string): boolean {
   const date = new Date(dateString);
   return !isNaN(date.getTime());
 }
 
-/**
- * Parse time string to 24-hour format
- * @param timeString Time string (e.g., "2:30 PM")
- * @returns Time in HH:MM format
- */
 export function parseTimeString(timeString: string): string | null {
   try {
     const date = new Date(`2000-01-01 ${timeString}`);

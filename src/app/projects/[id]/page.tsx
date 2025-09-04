@@ -65,9 +65,7 @@ export default function SyllabusPage({
         setLoading(true);
         setError(null);
 
-        // Fetch syllabus data
         const { syllabus, error: syllabusError } = await getSyllabus(classId);
-        console.log("Syllabus data:", syllabus);
 
         if (syllabusError) {
           console.error("Error fetching syllabus:", syllabusError);
@@ -83,13 +81,10 @@ export default function SyllabusPage({
         const syllabusData = syllabus[0];
         setSyllabus(syllabusData);
 
-        // Fetch calendar events
         const { events, error: eventsError } = await getCalendarEvents(classId);
-        console.log("Calendar events:", events);
 
         if (eventsError) {
           console.error("Error fetching calendar events:", eventsError);
-          // Don't fail completely if events fail to load
           setEvents([]);
         } else {
           setEvents(events || []);
@@ -132,7 +127,6 @@ export default function SyllabusPage({
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Calendar Events
@@ -143,7 +137,6 @@ export default function SyllabusPage({
             </p>
           )}
 
-          {/* View Toggle */}
           <div className="mt-4 flex items-center gap-2">
             <span className="text-sm text-gray-600">View:</span>
             <button
@@ -169,10 +162,8 @@ export default function SyllabusPage({
           </div>
         </div>
 
-        {/* Events Display */}
         {events.length > 0 ? (
           <div className="grid gap-6">
-            {/* Summary Stats */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 Summary
@@ -205,7 +196,6 @@ export default function SyllabusPage({
               </div>
             </div>
 
-            {/* Calendar or List View */}
             {viewMode === "calendar" ? (
               <CalendarView classId={id.id.toString()} />
             ) : (
@@ -333,7 +323,6 @@ export default function SyllabusPage({
   );
 }
 
-// Helper function to get event type colors
 const getEventTypeColor = (eventType: string) => {
   switch (eventType) {
     case "assignment":

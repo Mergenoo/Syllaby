@@ -9,7 +9,6 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
@@ -28,7 +27,6 @@ export default async function HomePage() {
                 </p>
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                   {user ? (
-                    // Show different buttons for logged-in users
                     <div className="rounded-md shadow">
                       <Link
                         href="/projects"
@@ -38,7 +36,6 @@ export default async function HomePage() {
                       </Link>
                     </div>
                   ) : (
-                    // Show signup/login buttons for non-logged-in users
                     <>
                       <div className="rounded-md shadow">
                         <Link
@@ -85,7 +82,6 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Features Section */}
       <div className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
@@ -207,7 +203,6 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* CTA Section */}
       <div className="bg-blue-600">
         <div className="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl">

@@ -3,10 +3,10 @@ import { createClient } from "@/utils/supabase/server";
 
 import { CalendarEvent } from "@/types/database";
 
-// Helper function to ensure proper URL construction
+
 const buildApiUrl = (baseUrl: string, endpoint: string): string => {
-  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); 
+  const cleanEndpoint = endpoint.replace(/^\//, "");
   return `${cleanBaseUrl}/${cleanEndpoint}`;
 };
 

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-// Helper function to ensure proper URL construction
 const buildApiUrl = (baseUrl: string, endpoint: string): string => {
-  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  const cleanBaseUrl = baseUrl.replace(/\/$/, "");
+  const cleanEndpoint = endpoint.replace(/^\//, "");
   return `${cleanBaseUrl}/${cleanEndpoint}`;
 };
 
@@ -37,7 +36,6 @@ export async function GET(
       process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
 
     if (type === "auth-url") {
-      // Get OAuth URL
       const response = await fetch(
         buildApiUrl(backendUrl, `api/auth/google/auth-url?user_id=${userId}`)
       );
@@ -74,7 +72,6 @@ export async function GET(
       const data = await response.json();
       return NextResponse.json(data);
     } else if (type === "events") {
-      // Get events from user's calendar
       const calendarId = searchParams.get("calendarId");
       const startDate = searchParams.get("startDate");
       const endDate = searchParams.get("endDate");

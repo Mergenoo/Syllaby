@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-// Helper function to ensure proper URL construction
 const buildApiUrl = (baseUrl: string, endpoint: string): string => {
-  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  const cleanBaseUrl = baseUrl.replace(/\/$/, "");
+  const cleanEndpoint = endpoint.replace(/^\//, "");
   return `${cleanBaseUrl}/${cleanEndpoint}`;
 };
 
@@ -25,8 +24,8 @@ export async function DELETE(
 
     const { userId } = await params;
 
-    // Call backend to disconnect
-    const backendUrl = process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
+    const backendUrl =
+      process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     const response = await fetch(
       buildApiUrl(backendUrl, `api/auth/google/disconnect/${userId}`),
       {

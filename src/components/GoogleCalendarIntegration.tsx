@@ -73,7 +73,6 @@ export default function GoogleCalendarIntegration({
     [supabase]
   );
 
-  // Get current user on component mount
   useEffect(() => {
     const getUser = async () => {
       const {
@@ -109,7 +108,6 @@ export default function GoogleCalendarIntegration({
         throw new Error("User not authenticated");
       }
 
-      // Get OAuth URL
       const response = await fetch(
         `/api/auth/google?type=auth-url&user_id=${user.id}`
       );
@@ -119,7 +117,6 @@ export default function GoogleCalendarIntegration({
 
       const { authUrl } = await response.json();
 
-      // Redirect to Google OAuth with user ID as state
       const oauthUrl = `${authUrl}&state=${user.id}`;
       window.location.href = oauthUrl;
     } catch (error) {
@@ -225,7 +222,6 @@ export default function GoogleCalendarIntegration({
         }`
       );
 
-      // Refresh the page after successful sync
       setTimeout(() => {
         window.location.reload();
       }, 2000);
@@ -272,11 +268,9 @@ export default function GoogleCalendarIntegration({
           : "Connect Google Calendar"}
       </button>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -308,7 +302,6 @@ export default function GoogleCalendarIntegration({
               )}
             </div>
 
-            {/* Modal Content */}
             <div className="p-6">
               {error ? (
                 <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
@@ -355,7 +348,6 @@ export default function GoogleCalendarIntegration({
               ) : null}
 
               <div className="space-y-6">
-                {/* Step 1: Select Calendar */}
                 <div>
                   <h4 className="text-md font-medium text-gray-900 mb-3">
                     Step 1: Select Google Calendar
@@ -386,7 +378,6 @@ export default function GoogleCalendarIntegration({
                     <p className="text-gray-600">No Google Calendars found.</p>
                   )}
 
-                  {/* Quick Sync Button */}
                   {calendars.length > 0 && (
                     <button
                       onClick={() =>
@@ -403,7 +394,6 @@ export default function GoogleCalendarIntegration({
                   )}
                 </div>
 
-                {/* Step 2: Review Events */}
                 {googleEvents.length > 0 && (
                   <div>
                     <h4 className="text-md font-medium text-gray-900 mb-3">
@@ -443,7 +433,6 @@ export default function GoogleCalendarIntegration({
                   </div>
                 )}
 
-                {/* Disconnect Option */}
                 <div className="border-t pt-4">
                   <button
                     onClick={disconnectGoogleCalendar}
@@ -454,7 +443,6 @@ export default function GoogleCalendarIntegration({
                   </button>
                 </div>
 
-                {/* Instructions */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                   <h4 className="text-sm font-medium text-blue-900 mb-2">
                     How it works:
@@ -474,7 +462,6 @@ export default function GoogleCalendarIntegration({
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="p-6 border-t border-gray-200">
               <button
                 onClick={closeModal}

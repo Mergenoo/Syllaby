@@ -9,7 +9,6 @@ import GoogleCalendarIntegration from "@/components/GoogleCalendarIntegration";
 export default async function ProjectsPage() {
   const supabase = await createClient();
 
-  // Check authentication
   const {
     data: { user },
     error: authError,
@@ -142,7 +141,6 @@ export default async function ProjectsPage() {
           )}
         </div>
 
-        {/* Calendar Section */}
         <div className="mt-8">
           <CalendarView />
         </div>

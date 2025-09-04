@@ -56,7 +56,6 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-100">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -67,7 +66,6 @@ export default function Navbar() {
               </span>
             </Link>
 
-            {/* Navigation Links */}
             {user && (
               <div className="hidden md:flex items-center ml-12 space-x-8">
                 <Link
@@ -88,7 +86,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* User Actions */}
           <div className="flex items-center space-x-4">
             {user ? (
               <>

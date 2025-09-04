@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-// Helper function to ensure proper URL construction
 const buildApiUrl = (baseUrl: string, endpoint: string): string => {
-  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  const cleanBaseUrl = baseUrl.replace(/\/$/, "");
+  const cleanEndpoint = endpoint.replace(/^\//, "");
   return `${cleanBaseUrl}/${cleanEndpoint}`;
 };
 
@@ -92,7 +91,7 @@ export async function GET(
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type"); // 'calendars' or 'events'
+    const type = searchParams.get("type");
     const calendarId = searchParams.get("calendarId");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");

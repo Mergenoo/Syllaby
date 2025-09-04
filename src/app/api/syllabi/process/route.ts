@@ -14,7 +14,6 @@ export async function POST(
   try {
     const supabase = await createClient();
 
-    // Check authentication
     const {
       data: { user },
       error: authError,
@@ -36,7 +35,6 @@ export async function POST(
       );
     }
 
-    // Get syllabus content
     const { data: syllabus, error: syllabusError } = await supabase
       .from("syllabi")
       .select("content_text, processing_status")
@@ -65,7 +63,6 @@ export async function POST(
       );
     }
 
-    // Update processing status
     await supabase
       .from("syllabi")
       .update({ processing_status: "processing" })
@@ -74,22 +71,15 @@ export async function POST(
     const startTime = Date.now();
 
     try {
-      // Extract events using LLM
-      console.log("Starting LLM extraction for syllabus:", syllabusId);
       const extractedEvents = await extractEventsWithLLM(syllabus.content_text);
-      console.log("Extracted events count:", extractedEvents.length);
 
-      // Validate and deduplicate events
       const validEvents = validateExtractedEvents(extractedEvents);
-      console.log("Valid events count:", validEvents.length);
-      const uniqueEvents = deduplicateEvents(validEvents);
-      console.log("Unique events count:", uniqueEvents.length);
 
-      // Convert to database format and insert
+      const uniqueEvents = deduplicateEvents(validEvents);
+
       const calendarEvents = uniqueEvents.map((event) =>
         convertToCalendarEvent(event, classId, user.id, syllabusId)
       );
-      console.log("Calendar events to insert:", calendarEvents.length);
 
       if (calendarEvents.length > 0) {
         const { error: insertError } = await supabase
@@ -100,12 +90,10 @@ export async function POST(
           console.error("Failed to insert calendar events:", insertError);
           throw new Error(`Failed to insert events: ${insertError.message}`);
         }
-        console.log("Successfully inserted calendar events");
       } else {
         console.log("No calendar events to insert");
       }
 
-      // Update syllabus status to completed
       await supabase
         .from("syllabi")
         .update({
@@ -123,7 +111,7 @@ export async function POST(
       });
     } catch (processingError) {
       console.error("Processing error occurred:", processingError);
-      // Update syllabus status to failed
+
       await supabase
         .from("syllabi")
         .update({
@@ -153,7 +141,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createClient();
 
-    // Check authentication
     const {
       data: { user },
       error: authError,
@@ -175,7 +162,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Get processing status
     const { data: syllabus, error: syllabusError } = await supabase
       .from("syllabi")
       .select("processing_status, processing_error")
@@ -189,7 +175,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // If processing is complete, get the extracted events
     if (syllabus.processing_status === "completed") {
       const { data: events, error: eventsError } = await supabase
         .from("calendar_events")
@@ -211,7 +196,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // Return processing status
     return NextResponse.json({
       success: true,
       status: syllabus.processing_status,

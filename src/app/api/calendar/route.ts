@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-// Helper function to ensure proper URL construction
+
 const buildApiUrl = (baseUrl: string, endpoint: string): string => {
-  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); 
+  const cleanEndpoint = endpoint.replace(/^\//, ""); 
   return `${cleanBaseUrl}/${cleanEndpoint}`;
 };
 

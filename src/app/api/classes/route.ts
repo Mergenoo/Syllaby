@@ -5,7 +5,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createClient();
 
-    // Check authentication
     const {
       data: { user },
       error: authError,
@@ -20,7 +19,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const body = await request.json();
     const { name, code, instructor, semester, academic_year } = body;
 
-    // Validate required fields
     if (!name || name.trim() === "") {
       return NextResponse.json(
         { success: false, error: "Class name is required" },
@@ -28,7 +26,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Check for duplicate class (same name and semester for the user)
     if (semester) {
       const { data: existingClass } = await supabase
         .from("classes")
@@ -50,7 +47,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // Create the class
     const { data: newClass, error: insertError } = await supabase
       .from("classes")
       .insert({
@@ -93,7 +89,6 @@ export async function GET(): Promise<NextResponse> {
   try {
     const supabase = await createClient();
 
-    // Check authentication
     const {
       data: { user },
       error: authError,
@@ -105,7 +100,7 @@ export async function GET(): Promise<NextResponse> {
       );
     }
 
-    // Get user's classes
+   
     const { data: classes, error: fetchError } = await supabase
       .from("classes")
       .select("*")
