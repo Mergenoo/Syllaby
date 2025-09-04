@@ -28,6 +28,17 @@ const CalendarView = ({ events }: { events: CalendarEvent[] }) => {
     eventUrl?: string;
   } | null>(null);
 
+  const formatDate = (dateString: string): string => {
+    // Parse the date string and format it consistently without timezone issues
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
+    return date.toLocaleDateString("en-US", {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   // Get current month's start and end dates
   const startOfMonth = new Date(
     currentDate.getFullYear(),
@@ -56,8 +67,18 @@ const CalendarView = ({ events }: { events: CalendarEvent[] }) => {
   // Get events for a specific date
   const getEventsForDate = (date: Date) => {
     return events.filter((event) => {
-      const eventDate = new Date(event.due_date);
-      return eventDate.toDateString() === date.toDateString();
+      // Parse the event date string directly to avoid timezone issues
+      const [eventYear, eventMonth, eventDay] = event.due_date
+        .split("-")
+        .map(Number);
+      const eventDate = new Date(eventYear, eventMonth - 1, eventDay);
+
+      // Compare year, month, and day directly
+      return (
+        eventDate.getFullYear() === date.getFullYear() &&
+        eventDate.getMonth() === date.getMonth() &&
+        eventDate.getDate() === date.getDate()
+      );
     });
   };
 
@@ -354,9 +375,7 @@ const CalendarView = ({ events }: { events: CalendarEvent[] }) => {
                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      <span>
-                        {new Date(selectedEvent.due_date).toLocaleDateString()}
-                      </span>
+                      <span>{formatDate(selectedEvent.due_date)}</span>
                     </div>
                   </div>
                   {selectedEvent.due_time && (
@@ -594,6 +613,17 @@ export default function SyllabusPage({
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("calendar");
 
+  const formatDate = (dateString: string): string => {
+    // Parse the date string and format it consistently without timezone issues
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
+    return date.toLocaleDateString("en-US", {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   useEffect(() => {
     const fetchData = async (classId: string) => {
       try {
@@ -792,9 +822,7 @@ export default function SyllabusPage({
                                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                 />
                               </svg>
-                              <span>
-                                {new Date(event.due_date).toLocaleDateString()}
-                              </span>
+                              <span>{formatDate(event.due_date)}</span>
                             </div>
                             {event.due_time && (
                               <div className="flex items-center gap-1">

@@ -108,7 +108,17 @@ export default function CalendarExtractionTest() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium">Due Date:</span>{" "}
-                    {new Date(event.due_date).toLocaleDateString()}
+                    {(() => {
+                      const [year, month, day] = event.due_date
+                        .split("-")
+                        .map(Number);
+                      const date = new Date(year, month - 1, day);
+                      return date.toLocaleDateString("en-US", {
+                        month: "numeric",
+                        day: "numeric",
+                        year: "numeric",
+                      });
+                    })()}
                   </div>
                   {event.due_time && (
                     <div>

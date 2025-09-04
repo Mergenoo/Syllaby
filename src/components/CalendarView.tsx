@@ -87,8 +87,18 @@ export default function CalendarView() {
       date.setDate(startDate.getDate() + i);
 
       const dayEvents = events.filter((event) => {
-        const eventDate = new Date(event.due_date);
-        return eventDate.toDateString() === date.toDateString();
+        // Parse the event date string directly to avoid timezone issues
+        const [eventYear, eventMonth, eventDay] = event.due_date
+          .split("-")
+          .map(Number);
+        const eventDate = new Date(eventYear, eventMonth - 1, eventDay);
+
+        // Compare year, month, and day directly
+        return (
+          eventDate.getFullYear() === date.getFullYear() &&
+          eventDate.getMonth() === date.getMonth() &&
+          eventDate.getDate() === date.getDate()
+        );
       });
 
       days.push({
@@ -147,6 +157,17 @@ export default function CalendarView() {
   const formatTime = (time: string | null): string => {
     if (!time) return "";
     return time.substring(0, 5); // HH:MM
+  };
+
+  const formatDate = (dateString: string): string => {
+    // Parse the date string and format it consistently without timezone issues
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // month is 0-indexed
+    return date.toLocaleDateString("en-US", {
+      month: "numeric",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   const previousMonth = () => {
@@ -300,9 +321,7 @@ export default function CalendarView() {
 
               <div className="flex items-center">
                 <span className="font-medium w-20">Date:</span>
-                <span>
-                  {new Date(selectedEvent.due_date).toLocaleDateString()}
-                </span>
+                <span>{formatDate(selectedEvent.due_date)}</span>
               </div>
 
               {selectedEvent.due_time && (
