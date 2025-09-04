@@ -4,30 +4,18 @@ import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 
-// Helper function to ensure proper URL construction
-const buildApiUrl = (baseUrl: string, endpoint: string): string => {
-  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
-  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
-  return `${cleanBaseUrl}/${cleanEndpoint}`;
-};
-
 export default function GoogleCalendarIntegration() {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   const supabase = createClient();
-  const backendUrl =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "https://law-bandit-back.vercel.app";
 
   const checkConnectionStatus = useCallback(
     async (userId: string) => {
       try {
         const response = await fetch(
-          buildApiUrl(
-            backendUrl,
-            `api/google-calendar/connection-status/${userId}`
-          )
+          `/api/google-calendar/connection-status/${userId}`
         );
 
         if (response.ok) {
@@ -41,7 +29,7 @@ export default function GoogleCalendarIntegration() {
         setIsConnected(false);
       }
     },
-    [backendUrl]
+    []
   );
 
   // Get current user on component mount
@@ -81,9 +69,7 @@ export default function GoogleCalendarIntegration() {
       }
 
       // Get OAuth URL
-      const response = await fetch(
-        buildApiUrl(backendUrl, "api/auth/google/url")
-      );
+      const response = await fetch("/api/auth/google/url");
       if (!response.ok) {
         throw new Error("Failed to get OAuth URL");
       }
@@ -109,12 +95,9 @@ export default function GoogleCalendarIntegration() {
         throw new Error("User not authenticated");
       }
 
-      const response = await fetch(
-        buildApiUrl(backendUrl, `api/auth/google/disconnect/${user.id}`),
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/auth/google/disconnect/${user.id}`, {
+        method: "DELETE",
+      });
 
       if (response.ok) {
         setIsConnected(false);
