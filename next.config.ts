@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BACKEND_URL:
-      process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001",
+      process.env.NEXT_PUBLIC_BACKEND_URL ||
+      "https://law-bandit-back.vercel.app",
   },
 };
 

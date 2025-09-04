@@ -35,7 +35,7 @@ export async function POST(
       );
     }
 
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:3001";
+    const backendUrl = process.env.BACKEND_URL;
     const response = await fetch(
       `${backendUrl}/api/google-calendar/add-to-google-calendar`,
       {
@@ -89,7 +89,7 @@ export async function GET(
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:3001";
+    const backendUrl = process.env.BACKEND_URL || process.env.BACKEND_URL;
     let endpoint = "";
 
     if (type === "calendars") {

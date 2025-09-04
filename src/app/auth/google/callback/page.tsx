@@ -49,7 +49,7 @@ function GoogleCallbackContent() {
 
         // Call backend to exchange code for tokens
         const backendUrl =
-          process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
+          process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
         const response = await fetch(
           `${backendUrl}/api/auth/google/callback?code=${code}&state=${user.id}`
         );

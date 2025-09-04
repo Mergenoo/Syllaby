@@ -24,7 +24,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:3001";
+    const backendUrl = process.env.BACKEND_URL || process.env.BACKEND_URL;
 
     if (type === "auth-url") {
       // Get OAuth URL
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:3001";
+    const backendUrl = process.env.BACKEND_URL;
     const response = await fetch(`${backendUrl}/api/auth/google/add-event`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
