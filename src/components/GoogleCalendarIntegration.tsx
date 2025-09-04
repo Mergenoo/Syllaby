@@ -4,6 +4,13 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 
+// Helper function to ensure proper URL construction
+const buildApiUrl = (baseUrl: string, endpoint: string): string => {
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  return `${cleanBaseUrl}/${cleanEndpoint}`;
+};
+
 export default function GoogleCalendarIntegration() {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -44,7 +51,10 @@ export default function GoogleCalendarIntegration() {
   const checkConnectionStatus = async (userId: string) => {
     try {
       const response = await fetch(
-        `${backendUrl}/api/google-calendar/connection-status/${userId}`
+        buildApiUrl(
+          backendUrl,
+          `api/google-calendar/connection-status/${userId}`
+        )
       );
 
       if (response.ok) {
@@ -68,7 +78,9 @@ export default function GoogleCalendarIntegration() {
       }
 
       // Get OAuth URL
-      const response = await fetch(`${backendUrl}/api/auth/google/url`);
+      const response = await fetch(
+        buildApiUrl(backendUrl, "api/auth/google/url")
+      );
       if (!response.ok) {
         throw new Error("Failed to get OAuth URL");
       }
@@ -95,7 +107,7 @@ export default function GoogleCalendarIntegration() {
       }
 
       const response = await fetch(
-        `${backendUrl}/api/auth/google/disconnect/${user.id}`,
+        buildApiUrl(backendUrl, `api/auth/google/disconnect/${user.id}`),
         {
           method: "DELETE",
         }

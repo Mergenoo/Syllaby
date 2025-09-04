@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
+// Helper function to ensure proper URL construction
+const buildApiUrl = (baseUrl: string, endpoint: string): string => {
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  return `${cleanBaseUrl}/${cleanEndpoint}`;
+};
+
 interface GoogleCalendarResponse {
   message: string;
   eventId?: string;
@@ -38,7 +45,7 @@ export async function POST(
     const backendUrl =
       process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     const response = await fetch(
-      `${backendUrl}/api/google-calendar/add-to-google-calendar`,
+      buildApiUrl(backendUrl, "api/google-calendar/add-to-google-calendar"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -95,7 +102,7 @@ export async function GET(
     let endpoint = "";
 
     if (type === "calendars") {
-      endpoint = `${backendUrl}/api/google-calendar/calendars`;
+      endpoint = buildApiUrl(backendUrl, "api/google-calendar/calendars");
     } else if (type === "events") {
       if (!startDate || !endDate) {
         return NextResponse.json(
@@ -105,9 +112,12 @@ export async function GET(
           { status: 400 }
         );
       }
-      endpoint = `${backendUrl}/api/google-calendar/events?startDate=${startDate}&endDate=${endDate}${
-        calendarId ? `&calendarId=${calendarId}` : ""
-      }`;
+      endpoint = buildApiUrl(
+        backendUrl,
+        `api/google-calendar/events?startDate=${startDate}&endDate=${endDate}${
+          calendarId ? `&calendarId=${calendarId}` : ""
+        }`
+      );
     } else {
       return NextResponse.json(
         {

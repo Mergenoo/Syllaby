@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
+// Helper function to ensure proper URL construction
+const buildApiUrl = (baseUrl: string, endpoint: string): string => {
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  return `${cleanBaseUrl}/${cleanEndpoint}`;
+};
+
 interface CalendarEvent {
   title: string;
   description: string | null;
@@ -45,13 +52,16 @@ export async function POST(
     // Call backend calendar extraction API
     const backendUrl =
       process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
-    const response = await fetch(`${backendUrl}/api/calendar/extract-events`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ pdf_context }),
-    });
+    const response = await fetch(
+      buildApiUrl(backendUrl, "api/calendar/extract-events"),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pdf_context }),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();

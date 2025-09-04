@@ -3,6 +3,13 @@ import { createClient } from "@/utils/supabase/server";
 
 import { CalendarEvent } from "@/types/database";
 
+// Helper function to ensure proper URL construction
+const buildApiUrl = (baseUrl: string, endpoint: string): string => {
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  return `${cleanBaseUrl}/${cleanEndpoint}`;
+};
+
 interface ImportEvent {
   title: string;
   description?: string;
@@ -54,7 +61,7 @@ export async function POST(
     const backendUrl =
       process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
     const response = await fetch(
-      `${backendUrl}/api/calendar/import-from-google`,
+      buildApiUrl(backendUrl, "api/calendar/import-from-google"),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

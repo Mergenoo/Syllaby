@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+// Helper function to ensure proper URL construction
+const buildApiUrl = (baseUrl: string, endpoint: string): string => {
+  const cleanBaseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
+  const cleanEndpoint = endpoint.replace(/^\//, ""); // Remove leading slash
+  return `${cleanBaseUrl}/${cleanEndpoint}`;
+};
+
+export async function GET(
+  request: NextRequest
+): Promise<NextResponse<Record<string, unknown>>> {
   try {
     const supabase = await createClient();
     const {
@@ -30,7 +39,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     if (type === "auth-url") {
       // Get OAuth URL
       const response = await fetch(
-        `${backendUrl}/api/auth/google/auth-url?user_id=${userId}`
+        buildApiUrl(backendUrl, `api/auth/google/auth-url?user_id=${userId}`)
       );
 
       if (!response.ok) {
@@ -49,7 +58,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     } else if (type === "calendars") {
       // Get user's calendars
       const response = await fetch(
-        `${backendUrl}/api/auth/google/calendars?user_id=${userId}`
+        buildApiUrl(backendUrl, `api/auth/google/calendars?user_id=${userId}`)
       );
 
       if (!response.ok) {
@@ -81,7 +90,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       }
 
       const response = await fetch(
-        `${backendUrl}/api/auth/google/events?user_id=${userId}&calendarId=${calendarId}&startDate=${startDate}&endDate=${endDate}`
+        buildApiUrl(
+          backendUrl,
+          `api/auth/google/events?user_id=${userId}&calendarId=${calendarId}&startDate=${startDate}&endDate=${endDate}`
+        )
       );
 
       if (!response.ok) {
@@ -140,11 +152,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const backendUrl =
       process.env.BACKEND_URL || "https://law-bandit-back.vercel.app";
-    const response = await fetch(`${backendUrl}/api/auth/google/add-event`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id, eventData, calendarId }),
-    });
+    const response = await fetch(
+      buildApiUrl(backendUrl, "api/auth/google/add-event"),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id, eventData, calendarId }),
+      }
+    );
 
     if (!response.ok) {
       const errorData = await response.json();
