@@ -11,26 +11,23 @@ export default function GoogleCalendarIntegration() {
 
   const supabase = createClient();
 
-  const checkConnectionStatus = useCallback(
-    async (userId: string) => {
-      try {
-        const response = await fetch(
-          `/api/google-calendar/connection-status/${userId}`
-        );
+  const checkConnectionStatus = useCallback(async (userId: string) => {
+    try {
+      const response = await fetch(
+        `/api/google-calendar/connection-status/${userId}`
+      );
 
-        if (response.ok) {
-          const status = await response.json();
-          setIsConnected(status.connected);
-        } else {
-          setIsConnected(false);
-        }
-      } catch (error) {
-        console.error("Error checking connection status:", error);
+      if (response.ok) {
+        const status = await response.json();
+        setIsConnected(status.connected);
+      } else {
         setIsConnected(false);
       }
-    },
-    []
-  );
+    } catch (error) {
+      console.error("Error checking connection status:", error);
+      setIsConnected(false);
+    }
+  }, []);
 
   // Get current user on component mount
   useEffect(() => {
