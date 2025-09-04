@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 
@@ -19,6 +19,30 @@ export default function GoogleCalendarIntegration() {
   const supabase = createClient();
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL || "https://law-bandit-back.vercel.app";
+
+  const checkConnectionStatus = useCallback(
+    async (userId: string) => {
+      try {
+        const response = await fetch(
+          buildApiUrl(
+            backendUrl,
+            `api/google-calendar/connection-status/${userId}`
+          )
+        );
+
+        if (response.ok) {
+          const status = await response.json();
+          setIsConnected(status.connected);
+        } else {
+          setIsConnected(false);
+        }
+      } catch (error) {
+        console.error("Error checking connection status:", error);
+        setIsConnected(false);
+      }
+    },
+    [backendUrl]
+  );
 
   // Get current user on component mount
   useEffect(() => {
@@ -46,28 +70,7 @@ export default function GoogleCalendarIntegration() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  const checkConnectionStatus = async (userId: string) => {
-    try {
-      const response = await fetch(
-        buildApiUrl(
-          backendUrl,
-          `api/google-calendar/connection-status/${userId}`
-        )
-      );
-
-      if (response.ok) {
-        const status = await response.json();
-        setIsConnected(status.connected);
-      } else {
-        setIsConnected(false);
-      }
-    } catch (error) {
-      console.error("Error checking connection status:", error);
-      setIsConnected(false);
-    }
-  };
+  }, [checkConnectionStatus]);
 
   const connectGoogleCalendar = async () => {
     try {
