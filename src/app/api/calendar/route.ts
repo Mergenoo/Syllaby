@@ -44,7 +44,7 @@ export async function POST(
 
     // Call backend calendar extraction API
     const backendUrl =
-      process.env.BACKEND_URL || "https://your-backend-domain.com";
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
     const response = await fetch(`${backendUrl}/api/calendar/extract-events`, {
       method: "POST",
       headers: {

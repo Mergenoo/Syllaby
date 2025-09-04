@@ -51,7 +51,8 @@ export async function POST(
       );
     }
 
-    const backendUrl = process.env.BACKEND_URL || process.env.BACKEND_URL;
+    const backendUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
     const response = await fetch(
       `${backendUrl}/api/calendar/import-from-google`,
       {

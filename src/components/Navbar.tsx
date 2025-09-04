@@ -39,17 +39,13 @@ export default function Navbar() {
 
   if (loading) {
     return (
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+      <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-xl font-bold text-gray-900">Law Bandit</h1>
-              </div>
+              <div className="h-8 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
             </div>
-            <div className="flex items-center">
-              <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
-            </div>
+            <div className="h-8 w-24 bg-gray-200 rounded-lg animate-pulse"></div>
           </div>
         </div>
       </nav>
@@ -57,60 +53,73 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-100">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0">
-              <h1 className="text-xl font-bold text-gray-900">Law Bandit</h1>
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">LB</span>
+              </div>
+              <span className="text-xl font-semibold text-gray-900">
+                Law Bandit
+              </span>
             </Link>
+
+            {/* Navigation Links */}
             {user && (
-              <div className="ml-10 flex items-baseline space-x-4">
+              <div className="hidden md:flex items-center ml-12 space-x-8">
                 <Link
                   href="/projects"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium relative group"
                 >
                   My Classes
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-200 group-hover:w-full"></span>
                 </Link>
                 <Link
                   href="/calendar"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium relative group"
                 >
                   Calendar
-                </Link>
-                <Link
-                  href="/google-calendar"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Google Calendar
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-200 group-hover:w-full"></span>
                 </Link>
               </div>
             )}
           </div>
-          <div className="flex items-center">
+
+          {/* User Actions */}
+          <div className="flex items-center space-x-4">
             {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-700">
-                  Welcome, {user.email}
-                </span>
+              <>
+                <div className="hidden sm:flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600 text-sm font-medium">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-600 hidden lg:block">
+                    {user.email}
+                  </span>
+                </div>
                 <button
                   onClick={handleSignOut}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
                   Sign Out
                 </button>
-              </div>
+              </>
             ) : (
               <div className="flex items-center space-x-4">
                 <Link
                   href="/login"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 shadow-sm"
                 >
                   Sign Up
                 </Link>

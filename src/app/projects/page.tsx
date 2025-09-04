@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import CreateClassButton from "@/components/CreateClassButton";
 import ViewComponentsButtons from "@/components/ViewComponentsButtons";
 import UploadNewSyllabi from "@/components/UploadNewSyllabi";
-import GoogleCalendarOAuth from "@/components/GoogleCalendarOAuth";
 import CalendarView from "@/components/CalendarView";
+import GoogleCalendarIntegration from "@/components/GoogleCalendarIntegration";
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
@@ -40,7 +40,7 @@ export default async function ProjectsPage() {
               </p>
             </div>
             <div className="flex items-center space-x-3">
-              <GoogleCalendarOAuth classId="global" />
+              <GoogleCalendarIntegration />
               <CreateClassButton />
             </div>
           </div>
