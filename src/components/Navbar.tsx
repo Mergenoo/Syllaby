@@ -120,7 +120,7 @@ export default function Navbar() {
               <div className="hidden md:flex items-center ml-12 space-x-8">
                 <Link
                   href="/projects"
-                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium relative group"
+                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium relative group cursor-pointer"
                 >
                   My Classes
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-200 group-hover:w-full"></span>
@@ -134,7 +134,7 @@ export default function Navbar() {
               <>
                 <button
                   onClick={handleSignOut}
-                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200 cursor-pointer"
                 >
                   Sign Out
                 </button>
@@ -143,13 +143,13 @@ export default function Navbar() {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200 cursor-pointer"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 shadow-sm"
+                  className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200 shadow-sm cursor-pointer"
                 >
                   Sign Up
                 </Link>
