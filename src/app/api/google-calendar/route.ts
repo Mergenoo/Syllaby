@@ -101,7 +101,10 @@ export async function GET(
     let endpoint = "";
 
     if (type === "calendars") {
-      endpoint = buildApiUrl(backendUrl, "api/google-calendar/calendars");
+      endpoint = buildApiUrl(
+        backendUrl,
+        `api/google-calendar/calendars/${user.id}`
+      );
     } else if (type === "events") {
       if (!startDate || !endDate) {
         return NextResponse.json(
@@ -113,7 +116,9 @@ export async function GET(
       }
       endpoint = buildApiUrl(
         backendUrl,
-        `api/google-calendar/events?startDate=${startDate}&endDate=${endDate}${
+        `api/google-calendar/events?user_id=${
+          user.id
+        }&startDate=${startDate}&endDate=${endDate}${
           calendarId ? `&calendarId=${calendarId}` : ""
         }`
       );

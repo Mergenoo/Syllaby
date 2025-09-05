@@ -4,26 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 
-interface GoogleCalendarEvent {
-  id: string;
-  summary: string;
-  description?: string;
-  start: {
-    dateTime: string;
-    date?: string;
-  };
-  end: {
-    dateTime: string;
-    date?: string;
-  };
-}
-
 interface GoogleCalendarOAuthProps {
   classId?: string;
 }
 
 export default function GoogleCalendarIntegration({
-  classId,
+  classId, // TODO: Use classId for class-specific calendar sync
 }: GoogleCalendarOAuthProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,7 +20,6 @@ export default function GoogleCalendarIntegration({
     Array<{ id: string; summary: string; primary: boolean }>
   >([]);
   const [selectedCalendarId, setSelectedCalendarId] = useState<string>("");
-  const [googleEvents, setGoogleEvents] = useState<GoogleCalendarEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -98,7 +83,7 @@ export default function GoogleCalendarIntegration({
     });
 
     return () => subscription.unsubscribe();
-  }, [checkConnectionStatus]);
+  }, [checkConnectionStatus, supabase.auth]);
 
   const connectGoogleCalendar = async () => {
     try {
@@ -154,43 +139,47 @@ export default function GoogleCalendarIntegration({
     }
   };
 
+  const fetchCalendars = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch(`/api/google-calendar/calendars/${user.id}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch calendars");
+      }
+
+      const data = await response.json();
+      setCalendars(data.calendars || []);
+
+      if (data.calendars && data.calendars.length > 0) {
+        const primaryCalendar = data.calendars.find(
+          (cal: { id: string; summary: string; primary: boolean }) =>
+            cal.primary
+        );
+        setSelectedCalendarId(primaryCalendar?.id || data.calendars[0].id);
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Failed to fetch calendars"
+      );
+      console.error("Error fetching calendars:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const openModal = async () => {
     setIsModalOpen(true);
     setError(null);
     setSuccess(null);
 
     if (isConnected) {
-      await syncEvents();
-    }
-  };
-
-  const loadGoogleEvents = async () => {
-    if (!selectedCalendarId || !user) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const startDate = new Date().toISOString();
-      const endDate = new Date(
-        Date.now() + 6 * 30 * 24 * 60 * 60 * 1000
-      ).toISOString();
-
-      const response = await fetch(
-        `/api/auth/google?type=events&user_id=${user.id}&calendarId=${selectedCalendarId}&startDate=${startDate}&endDate=${endDate}`
-      );
-      const data = await response.json();
-
-      if (response.ok) {
-        setGoogleEvents(data.events || []);
-      } else {
-        setError(data.error || "Failed to load events");
-      }
-    } catch (error) {
-      setError("Failed to load events");
-      console.error("Error loading events:", error);
-    } finally {
-      setLoading(false);
+      await fetchCalendars();
     }
   };
 
@@ -206,7 +195,10 @@ export default function GoogleCalendarIntegration({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(options),
+          body: JSON.stringify({
+            calendarId: selectedCalendarId,
+            ...options,
+          }),
         }
       );
 
@@ -239,7 +231,6 @@ export default function GoogleCalendarIntegration({
     setIsModalOpen(false);
     setCalendars([]);
     setSelectedCalendarId("");
-    setGoogleEvents([]);
     setError(null);
     setSuccess(null);
   };
@@ -253,7 +244,7 @@ export default function GoogleCalendarIntegration({
       <button
         onClick={isConnected ? openModal : connectGoogleCalendar}
         disabled={loading}
-        className={`px-4 py-2 rounded-md text-white font-medium transition-colors ${
+        className={`px-4 py-2 rounded-md text-white font-medium transition-colors cursor-pointer ${
           isConnected
             ? "bg-green-600 hover:bg-green-700 disabled:bg-green-400"
             : "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400"
@@ -278,7 +269,7 @@ export default function GoogleCalendarIntegration({
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
                 >
                   <svg
                     className="w-6 h-6"
@@ -354,90 +345,79 @@ export default function GoogleCalendarIntegration({
                   </h4>
                   {calendars.length > 0 ? (
                     <div>
-                      <select
-                        value={selectedCalendarId}
-                        onChange={(e) => setSelectedCalendarId(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md"
-                      >
-                        {calendars.map((calendar) => (
-                          <option key={calendar.id} value={calendar.id}>
-                            {calendar.summary}{" "}
-                            {calendar.primary ? "(Primary)" : ""}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={loadGoogleEvents}
-                        disabled={!selectedCalendarId || loading}
-                        className="mt-3 w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                      >
-                        {loading ? "Loading..." : "Load Events"}
-                      </button>
+                      <div className="mb-3">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Choose which calendar to sync with:
+                        </label>
+                        <select
+                          value={selectedCalendarId}
+                          onChange={(e) =>
+                            setSelectedCalendarId(e.target.value)
+                          }
+                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                        >
+                          {calendars.map((calendar) => (
+                            <option key={calendar.id} value={calendar.id}>
+                              {calendar.summary}{" "}
+                              {calendar.primary ? "(Primary)" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-3">
+                        <button
+                          onClick={() =>
+                            syncEvents({
+                              syncAll: true,
+                            })
+                          }
+                          disabled={!selectedCalendarId || loading}
+                          className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                        >
+                          {loading ? "Syncing..." : "Sync Selected Calendar"}
+                        </button>
+                        <p className="text-sm text-gray-600 text-center">
+                          This will sync all events from your selected Google
+                          Calendar to your class calendar.
+                        </p>
+                      </div>
                     </div>
                   ) : (
-                    <p className="text-gray-600">No Google Calendars found.</p>
-                  )}
-
-                  {calendars.length > 0 && (
-                    <button
-                      onClick={() =>
-                        syncEvents({
-                          calendarId: selectedCalendarId || calendars[0]?.id,
-                          syncAll: true,
-                        })
-                      }
-                      disabled={loading}
-                      className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {loading ? "Syncing..." : "Quick Sync All Events"}
-                    </button>
+                    <div className="text-center py-8">
+                      <div className="text-gray-400 mb-2">
+                        <svg
+                          className="w-12 h-12 mx-auto"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        No Google Calendars found.
+                      </p>
+                      <button
+                        onClick={fetchCalendars}
+                        disabled={loading}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                      >
+                        {loading ? "Loading..." : "Refresh Calendars"}
+                      </button>
+                    </div>
                   )}
                 </div>
-
-                {googleEvents.length > 0 && (
-                  <div>
-                    <h4 className="text-md font-medium text-gray-900 mb-3">
-                      Step 2: Review Events ({googleEvents.length} found)
-                    </h4>
-                    <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
-                      {googleEvents.map((event, index) => (
-                        <div
-                          key={index}
-                          className="p-3 border-b border-gray-100 last:border-b-0"
-                        >
-                          <div className="font-medium text-gray-900">
-                            {event.summary}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {event.start.dateTime
-                              ? new Date(event.start.dateTime).toLocaleString()
-                              : event.start.date}
-                          </div>
-                          {event.description && (
-                            <div className="text-sm text-gray-500 mt-1">
-                              {event.description}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() =>
-                        syncEvents({ calendarId: selectedCalendarId })
-                      }
-                      disabled={loading}
-                      className="mt-3 w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    >
-                      {loading ? "Syncing..." : "Sync Events"}
-                    </button>
-                  </div>
-                )}
 
                 <div className="border-t pt-4">
                   <button
                     onClick={disconnectGoogleCalendar}
                     disabled={loading}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-colors"
                   >
                     Disconnect Google Calendar
                   </button>
@@ -448,10 +428,13 @@ export default function GoogleCalendarIntegration({
                     How it works:
                   </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Select your Google Calendar to import events from</li>
-                    <li>• Events from the next 6 months will be loaded</li>
+                    <li>• Select your Google Calendar to sync events from</li>
                     <li>
-                      • Review the events and import them to your class calendar
+                      • Click &quot;Sync Selected Calendar&quot; to import all events
+                    </li>
+                    <li>
+                      • Events will be automatically added to your class
+                      calendar
                     </li>
                     <li>
                       • You can also add your class events to Google Calendar
@@ -465,7 +448,7 @@ export default function GoogleCalendarIntegration({
             <div className="p-6 border-t border-gray-200">
               <button
                 onClick={closeModal}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors cursor-pointer"
               >
                 Close
               </button>
