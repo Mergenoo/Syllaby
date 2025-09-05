@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { extractTextFromPDF } from "@/utils/llm";
 import { extractCalendarEvents } from "@/utils/calendarExtraction";
@@ -113,6 +114,7 @@ export default function UploadNewSyllabi({
   classId,
   className = "",
 }: UploadNewSyllabiProps) {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -136,12 +138,11 @@ export default function UploadNewSyllabi({
     try {
       const result = await uploadSyllabi(file, classId);
       setSuccessMessage(
-        `✅ Syllabus uploaded successfully! Extracted ${result.savedEvents} calendar events.`
+        `✅ Syllabus uploaded successfully! Extracted ${result.savedEvents} calendar events. Redirecting to syllabus page...`
       );
       setIsModalOpen(false);
       setTimeout(() => {
-        setSuccessMessage(null);
-        window.location.reload();
+        router.push(`/projects/${classId}`);
       }, 2000);
     } catch (error) {
       console.error("Upload error:", error);
@@ -169,7 +170,8 @@ export default function UploadNewSyllabi({
               <h1 className="text-xl font-bold text-black">Upload Syllabus</h1>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-black/60 hover:text-black"
+                disabled={isLoading}
+                className="text-black/60 hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg
                   className="h-6 w-6"
@@ -186,6 +188,15 @@ export default function UploadNewSyllabi({
                 </svg>
               </button>
             </div>
+
+            {isLoading && (
+              <div className="mb-4 p-3 bg-white border border-black text-black rounded">
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-transparent"></div>
+                  <span>Processing syllabus and extracting events...</span>
+                </div>
+              </div>
+            )}
 
             {error && (
               <div className="mb-4 p-3 bg-white border border-black text-black rounded">
@@ -213,7 +224,8 @@ export default function UploadNewSyllabi({
                   name="syllabi"
                   accept=".pdf,.docx,.txt"
                   required
-                  className="mt-1 block w-full border border-black rounded-md px-3 py-2 text-black focus:outline-none focus:border-black bg-white"
+                  disabled={isLoading}
+                  className="mt-1 block w-full border border-black rounded-md px-3 py-2 text-black focus:outline-none focus:border-black bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <p className="mt-1 text-sm text-black/60">
                   Supported formats: PDF (recommended for automatic processing)
@@ -228,7 +240,8 @@ export default function UploadNewSyllabi({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-black bg-white border border-black rounded-md hover:bg-black/5 focus:outline-none focus:border-black"
+                  disabled={isLoading}
+                  className="px-4 py-2 text-sm font-medium text-black bg-white border border-black rounded-md hover:bg-black/5 focus:outline-none focus:border-black disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
