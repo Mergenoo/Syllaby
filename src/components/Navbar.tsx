@@ -9,28 +9,75 @@ import { User } from "@supabase/supabase-js";
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authKey, setAuthKey] = useState(0);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
+    const getSession = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error getting session:", error);
+        setLoading(false);
+      }
     };
 
-    getUser();
+    getSession();
+
+    const quickCheck = setTimeout(() => {
+      getSession();
+    }, 10);
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      setLoading(false);
+      setAuthKey((prev) => prev + 1);
     });
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    const timeout = setTimeout(() => {
+      if (loading) {
+        getSession();
+      }
+    }, 50);
+
+    const checkAuthOnFocus = () => {
+      getSession();
+    };
+
+    const checkAuthOnVisibilityChange = () => {
+      if (!document.hidden) {
+        getSession();
+      }
+    };
+
+    window.addEventListener("focus", checkAuthOnFocus);
+    document.addEventListener("visibilitychange", checkAuthOnVisibilityChange);
+
+    const interval = setInterval(() => {
+      if (loading) {
+        getSession();
+      }
+    }, 200);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("focus", checkAuthOnFocus);
+      document.removeEventListener(
+        "visibilitychange",
+        checkAuthOnVisibilityChange
+      );
+      clearInterval(interval);
+      clearTimeout(timeout);
+      clearTimeout(quickCheck);
+    };
+  }, [supabase.auth, loading]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -53,7 +100,10 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-100">
+    <nav
+      key={authKey}
+      className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-100"
+    >
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -75,13 +125,6 @@ export default function Navbar() {
                   My Classes
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-200 group-hover:w-full"></span>
                 </Link>
-                <Link
-                  href="/calendar"
-                  className="text-gray-600 hover:text-gray-900 transition-colors duration-200 text-sm font-medium relative group"
-                >
-                  Calendar
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gray-900 transition-all duration-200 group-hover:w-full"></span>
-                </Link>
               </div>
             )}
           </div>
@@ -89,16 +132,6 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <div className="hidden sm:flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                    <span className="text-gray-600 text-sm font-medium">
-                      {user.email?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="text-sm text-gray-600 hidden lg:block">
-                    {user.email}
-                  </span>
-                </div>
                 <button
                   onClick={handleSignOut}
                   className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
