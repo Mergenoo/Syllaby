@@ -5,6 +5,7 @@ import ViewComponentsButtons from "@/components/ViewComponentsButtons";
 import UploadNewSyllabi from "@/components/UploadNewSyllabi";
 import CalendarView from "@/components/CalendarView";
 import GoogleCalendarIntegration from "@/components/GoogleCalendarIntegration";
+import Navbar from "@/components/Navbar";
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
@@ -29,6 +30,7 @@ export default async function ProjectsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar user={user} />
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-6">

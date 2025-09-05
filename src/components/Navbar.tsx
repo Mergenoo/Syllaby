@@ -6,20 +6,31 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js";
 
-export default function Navbar() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+interface NavbarProps {
+  user?: User | null;
+}
+
+export default function Navbar({ user: initialUser }: NavbarProps) {
+  const [user, setUser] = useState<User | null>(initialUser || null);
+  const [loading, setLoading] = useState(!initialUser);
   const [authKey, setAuthKey] = useState(0);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => {
+    // Only fetch session if no initial user was provided
+    if (initialUser) {
+      setLoading(false);
+      return;
+    }
+
     const getSession = async () => {
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+        console.log("User:", session?.user?.email || "No user");
         setLoading(false);
       } catch (error) {
         console.error("Error getting session:", error);
@@ -29,10 +40,6 @@ export default function Navbar() {
 
     getSession();
 
-    const quickCheck = setTimeout(() => {
-      getSession();
-    }, 10);
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -41,43 +48,10 @@ export default function Navbar() {
       setAuthKey((prev) => prev + 1);
     });
 
-    const timeout = setTimeout(() => {
-      if (loading) {
-        getSession();
-      }
-    }, 50);
-
-    const checkAuthOnFocus = () => {
-      getSession();
-    };
-
-    const checkAuthOnVisibilityChange = () => {
-      if (!document.hidden) {
-        getSession();
-      }
-    };
-
-    window.addEventListener("focus", checkAuthOnFocus);
-    document.addEventListener("visibilitychange", checkAuthOnVisibilityChange);
-
-    const interval = setInterval(() => {
-      if (loading) {
-        getSession();
-      }
-    }, 200);
-
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener("focus", checkAuthOnFocus);
-      document.removeEventListener(
-        "visibilitychange",
-        checkAuthOnVisibilityChange
-      );
-      clearInterval(interval);
-      clearTimeout(timeout);
-      clearTimeout(quickCheck);
     };
-  }, [supabase.auth, loading]);
+  }, [supabase.auth, initialUser]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
