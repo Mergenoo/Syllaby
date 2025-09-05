@@ -157,21 +157,19 @@ export default function UploadNewSyllabi({
     <div>
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`bg-indigo-600 text-white px-3 py-1 rounded-md text-sm hover:bg-indigo-700 transition-colors ${className}`}
+        className={`bg-black text-white px-3 py-1 rounded-md text-sm hover:bg-black/90 transition-colors ${className}`}
       >
         Upload Syllabus
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border border-black w-96 shadow-lg rounded-md bg-white">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-bold text-gray-900">
-                Upload Syllabus
-              </h1>
+              <h1 className="text-xl font-bold text-black">Upload Syllabus</h1>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-black/60 hover:text-black"
               >
                 <svg
                   className="h-6 w-6"
@@ -190,13 +188,13 @@ export default function UploadNewSyllabi({
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="mb-4 p-3 bg-white border border-black text-black rounded">
                 {error}
               </div>
             )}
 
             {successMessage && (
-              <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+              <div className="mb-4 p-3 bg-white border border-black text-black rounded">
                 {successMessage}
               </div>
             )}
@@ -205,7 +203,7 @@ export default function UploadNewSyllabi({
               <div>
                 <label
                   htmlFor="syllabi"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-black"
                 >
                   Select Syllabus File
                 </label>
@@ -215,12 +213,12 @@ export default function UploadNewSyllabi({
                   name="syllabi"
                   accept=".pdf,.docx,.txt"
                   required
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="mt-1 block w-full border border-black rounded-md px-3 py-2 text-black focus:outline-none focus:border-black bg-white"
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-black/60">
                   Supported formats: PDF (recommended for automatic processing)
                 </p>
-                <p className="mt-1 text-xs text-blue-600">
+                <p className="mt-1 text-xs text-black/60">
                   This will automatically extract text, generate calendar
                   events, and save them to your database.
                 </p>
@@ -230,14 +228,14 @@ export default function UploadNewSyllabi({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  className="px-4 py-2 text-sm font-medium text-black bg-white border border-black rounded-md hover:bg-black/5 focus:outline-none focus:border-black"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-white bg-black border border-transparent rounded-md hover:bg-black/90 focus:outline-none focus:border-black disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? "Processing..." : "Upload & Process"}
                 </button>

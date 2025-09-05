@@ -12,6 +12,7 @@
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.0",
     "@types/pdfjs-dist": "^2.10.378",
+    "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "pdfjs-dist": "^5.4.149",
     "react": "19.1.0",

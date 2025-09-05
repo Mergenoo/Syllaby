@@ -29,14 +29,14 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user} />
+    <div className="min-h-screen bg-white">
+      <Navbar />
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Classes</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-4xl font-bold text-black">My Classes</h1>
+              <p className="text-black/60 mt-2">
                 Manage your academic courses and syllabi
               </p>
             </div>
@@ -47,40 +47,40 @@ export default async function ProjectsPage() {
           </div>
 
           {classes && classes.length > 0 ? (
-            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <div className="px-4 py-5 sm:px-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
+            <div className="bg-white border border-black rounded-lg overflow-hidden">
+              <div className="px-6 py-4 border-b border-black">
+                <h3 className="text-xl font-semibold text-black">
                   Your Classes
                 </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                <p className="mt-1 text-sm text-black/60">
                   Click on a class to view details and upload syllabi
                 </p>
               </div>
-              <ul className="divide-y divide-gray-200">
+              <ul className="divide-y divide-black">
                 {classes.map((classItem) => (
                   <li key={classItem.id}>
-                    <div className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <div className="px-6 py-4 hover:bg-black/5 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
-                            <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                              <span className="text-indigo-600 font-semibold text-lg">
+                            <div className="h-12 w-12 rounded-full bg-black flex items-center justify-center">
+                              <span className="text-white font-semibold text-lg">
                                 {classItem.name.charAt(0).toUpperCase()}
                               </span>
                             </div>
                           </div>
                           <div className="ml-4">
                             <div className="flex items-center">
-                              <h4 className="text-lg font-medium text-gray-900">
+                              <h4 className="text-lg font-semibold text-black">
                                 {classItem.name}
                               </h4>
                               {classItem.code && (
-                                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-black text-white">
                                   {classItem.code}
                                 </span>
                               )}
                             </div>
-                            <div className="mt-1 flex items-center text-sm text-gray-500">
+                            <div className="mt-1 flex items-center text-sm text-black/60">
                               {classItem.instructor && (
                                 <span className="mr-4">
                                   <span className="font-medium">
@@ -96,7 +96,7 @@ export default async function ProjectsPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-400 mt-1">
+                            <p className="text-sm text-black/40 mt-1">
                               Created{" "}
                               {new Date(
                                 classItem.created_at
@@ -115,8 +115,8 @@ export default async function ProjectsPage() {
               </ul>
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="mx-auto h-24 w-24 text-gray-400">
+            <div className="text-center py-16">
+              <div className="mx-auto h-24 w-24 text-black/40">
                 <svg
                   className="h-full w-full"
                   fill="none"
@@ -132,10 +132,10 @@ export default async function ProjectsPage() {
                   />
                 </svg>
               </div>
-              <h3 className="mt-4 text-lg font-medium text-gray-900">
+              <h3 className="mt-4 text-xl font-semibold text-black">
                 No classes yet
               </h3>
-              <p className="mt-2 text-gray-500">
+              <p className="mt-2 text-black/60">
                 Get started by creating your first class and uploading a
                 syllabus.
               </p>

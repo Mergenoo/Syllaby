@@ -11,7 +11,9 @@ export async function middleware(request: NextRequest) {
     (request.nextUrl.pathname.startsWith("/auth") &&
       !request.nextUrl.pathname.startsWith("/auth/google/callback"));
 
-  if (isAuthRoute && user) {
+  const isHomeRoute = request.nextUrl.pathname === "/";
+
+  if ((isAuthRoute || isHomeRoute) && user) {
     const redirectUrl = new URL("/projects", request.url);
     return NextResponse.redirect(redirectUrl);
   }

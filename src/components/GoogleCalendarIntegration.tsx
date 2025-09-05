@@ -246,8 +246,8 @@ export default function GoogleCalendarIntegration({
         disabled={loading}
         className={`px-4 py-2 rounded-md text-white font-medium transition-colors cursor-pointer ${
           isConnected
-            ? "bg-green-600 hover:bg-green-700 disabled:bg-green-400"
-            : "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400"
+            ? "bg-black hover:bg-black/90 disabled:bg-black/50"
+            : "bg-black hover:bg-black/90 disabled:bg-black/50"
         }`}
       >
         {loading
@@ -260,16 +260,16 @@ export default function GoogleCalendarIntegration({
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white border border-black rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-black">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-black">
                   Google Calendar Integration
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                  className="text-black/60 hover:text-black cursor-pointer"
                 >
                   <svg
                     className="w-6 h-6"
@@ -287,7 +287,7 @@ export default function GoogleCalendarIntegration({
                 </button>
               </div>
               {isConnected && userEmail && (
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-black/60 mt-2">
                   Connected as: {userEmail}
                 </p>
               )}
@@ -295,10 +295,10 @@ export default function GoogleCalendarIntegration({
 
             <div className="p-6">
               {error ? (
-                <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+                <div className="bg-white border border-black rounded-md p-4 mb-4">
                   <div className="flex">
                     <svg
-                      className="w-5 h-5 text-red-400"
+                      className="w-5 h-5 text-black/60"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -311,15 +311,15 @@ export default function GoogleCalendarIntegration({
                       />
                     </svg>
                     <div className="ml-3">
-                      <p className="text-sm text-red-800">{error}</p>
+                      <p className="text-sm text-black">{error}</p>
                     </div>
                   </div>
                 </div>
               ) : success ? (
-                <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                <div className="bg-white border border-black rounded-md p-4 mb-4">
                   <div className="flex">
                     <svg
-                      className="w-5 h-5 text-green-400"
+                      className="w-5 h-5 text-black/60"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -332,7 +332,7 @@ export default function GoogleCalendarIntegration({
                       />
                     </svg>
                     <div className="ml-3">
-                      <p className="text-sm text-green-800">{success}</p>
+                      <p className="text-sm text-black">{success}</p>
                     </div>
                   </div>
                 </div>
@@ -340,13 +340,13 @@ export default function GoogleCalendarIntegration({
 
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-3">
+                  <h4 className="text-md font-medium text-black mb-3">
                     Step 1: Select Google Calendar
                   </h4>
                   {calendars.length > 0 ? (
                     <div>
                       <div className="mb-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-black mb-2">
                           Choose which calendar to sync with:
                         </label>
                         <select
@@ -354,7 +354,7 @@ export default function GoogleCalendarIntegration({
                           onChange={(e) =>
                             setSelectedCalendarId(e.target.value)
                           }
-                          className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                          className="w-full p-3 border border-black rounded-md focus:outline-none focus:border-black cursor-pointer bg-white text-black"
                         >
                           {calendars.map((calendar) => (
                             <option key={calendar.id} value={calendar.id}>
@@ -372,11 +372,11 @@ export default function GoogleCalendarIntegration({
                             })
                           }
                           disabled={!selectedCalendarId || loading}
-                          className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                          className="w-full px-4 py-2 bg-black text-white rounded-md hover:bg-black/90 disabled:bg-black/50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                         >
                           {loading ? "Syncing..." : "Sync Selected Calendar"}
                         </button>
-                        <p className="text-sm text-gray-600 text-center">
+                        <p className="text-sm text-black/60 text-center">
                           This will sync all events from your selected Google
                           Calendar to your class calendar.
                         </p>
@@ -384,7 +384,7 @@ export default function GoogleCalendarIntegration({
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <div className="text-gray-400 mb-2">
+                      <div className="text-black/40 mb-2">
                         <svg
                           className="w-12 h-12 mx-auto"
                           fill="none"
@@ -399,13 +399,13 @@ export default function GoogleCalendarIntegration({
                           />
                         </svg>
                       </div>
-                      <p className="text-gray-600 mb-4">
+                      <p className="text-black/60 mb-4">
                         No Google Calendars found.
                       </p>
                       <button
                         onClick={fetchCalendars}
                         disabled={loading}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                        className="px-4 py-2 bg-black text-white rounded-md hover:bg-black/90 disabled:bg-black/50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                       >
                         {loading ? "Loading..." : "Refresh Calendars"}
                       </button>
@@ -413,24 +413,25 @@ export default function GoogleCalendarIntegration({
                   )}
                 </div>
 
-                <div className="border-t pt-4">
+                <div className="border-t border-black pt-4">
                   <button
                     onClick={disconnectGoogleCalendar}
                     disabled={loading}
-                    className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    className="w-full px-4 py-2 bg-black text-white rounded-md hover:bg-black/90 disabled:bg-black/50 disabled:cursor-not-allowed cursor-pointer transition-colors"
                   >
                     Disconnect Google Calendar
                   </button>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                  <h4 className="text-sm font-medium text-blue-900 mb-2">
+                <div className="bg-white border border-black rounded-md p-4">
+                  <h4 className="text-sm font-medium text-black mb-2">
                     How it works:
                   </h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                  <ul className="text-sm text-black/60 space-y-1">
                     <li>• Select your Google Calendar to sync events from</li>
                     <li>
-                      • Click &quot;Sync Selected Calendar&quot; to import all events
+                      • Click &quot;Sync Selected Calendar&quot; to import all
+                      events
                     </li>
                     <li>
                       • Events will be automatically added to your class
@@ -445,10 +446,10 @@ export default function GoogleCalendarIntegration({
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-200">
+            <div className="p-6 border-t border-black">
               <button
                 onClick={closeModal}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors cursor-pointer"
+                className="w-full px-4 py-2 bg-black text-white rounded-md hover:bg-black/90 transition-colors cursor-pointer"
               >
                 Close
               </button>
