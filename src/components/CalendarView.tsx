@@ -21,6 +21,11 @@ export default function CalendarView({ classId }: CalendarViewProps) {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null
   );
+  const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>(
+    []
+  );
+  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
+  const [isDayModalOpen, setIsDayModalOpen] = useState(false);
 
   const supabase = createClient();
 
@@ -196,6 +201,18 @@ export default function CalendarView({ classId }: CalendarViewProps) {
     setCurrentDate(new Date());
   };
 
+  const openDayModal = (dayEvents: CalendarEvent[], date: Date) => {
+    setSelectedDayEvents(dayEvents);
+    setSelectedDayDate(date);
+    setIsDayModalOpen(true);
+  };
+
+  const closeDayModal = () => {
+    setIsDayModalOpen(false);
+    setSelectedDayEvents([]);
+    setSelectedDayDate(null);
+  };
+
   const calendarDays = generateCalendarDays();
   const monthNames = [
     "January",
@@ -315,7 +332,10 @@ export default function CalendarView({ classId }: CalendarViewProps) {
                 </div>
               ))}
               {day.events.length > 2 && (
-                <div className="text-xs text-gray-500">
+                <div
+                  className="text-xs text-black/60 cursor-pointer hover:text-black hover:underline"
+                  onClick={() => openDayModal(day.events, day.date)}
+                >
                   +{day.events.length - 2} more
                 </div>
               )}
@@ -379,6 +399,144 @@ export default function CalendarView({ classId }: CalendarViewProps) {
                     : "Syllabus"}
                 </span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Day Events Modal */}
+      {isDayModalOpen && selectedDayDate && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white border border-black rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="p-6 border-b border-black sticky top-0 bg-white">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-black">
+                  Events for{" "}
+                  {selectedDayDate.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </h3>
+                <button
+                  onClick={closeDayModal}
+                  className="text-black/60 hover:text-black"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-4">
+                {selectedDayEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="p-4 border border-black rounded-lg hover:bg-black/5 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h4 className="text-lg font-semibold text-black">
+                            {event.title}
+                          </h4>
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              event.event_type === "assignment"
+                                ? "bg-blue-100 text-blue-800 border border-blue-200"
+                                : event.event_type === "exam"
+                                ? "bg-red-100 text-red-800 border border-red-200"
+                                : event.event_type === "reading"
+                                ? "bg-green-100 text-green-800 border border-green-200"
+                                : event.event_type === "google_calendar"
+                                ? "bg-indigo-100 text-indigo-800 border border-indigo-200"
+                                : "bg-gray-100 text-gray-800 border border-gray-200"
+                            }`}
+                          >
+                            {event.event_type}
+                          </span>
+                        </div>
+
+                        {event.description && (
+                          <p className="text-black/60 mb-3">
+                            {event.description}
+                          </p>
+                        )}
+
+                        <div className="flex items-center gap-6 text-sm text-black/60">
+                          <div className="flex items-center gap-1">
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span>{formatDate(event.due_date)}</span>
+                          </div>
+                          {event.due_time && (
+                            <div className="flex items-center gap-1">
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              <span>{formatTime(event.due_time)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {event.source_text && (
+                      <div className="mt-4 p-3 bg-white border border-black rounded-md">
+                        <p className="text-xs font-medium text-black/60 mb-1">
+                          Source Text:
+                        </p>
+                        <p className="text-sm text-black">
+                          {event.source_text}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-black">
+              <button
+                onClick={closeDayModal}
+                className="w-full px-4 py-2 bg-black text-white rounded-md hover:bg-black/90 transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
