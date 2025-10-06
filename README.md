@@ -1,6 +1,6 @@
-# Law Bandit Frontend
+# Syllaby Frontend
 
-A modern Next.js frontend for the Law Bandit application with comprehensive Google Calendar integration, Supabase authentication, and intelligent syllabus processing.
+A modern Next.js frontend for the Syllaby application with comprehensive Google Calendar integration, Supabase authentication, and intelligent syllabus processing.
 
 ## Features
 
