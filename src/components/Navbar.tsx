@@ -191,7 +191,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 mt-4 rounded-xl border border-black">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="focus:outline-none flex items-center gap-3">
-            <span className="text-2xl font-bold text-black">Law Bandit</span>
+            <span className="text-2xl font-bold text-black">Syllaby</span>
           </Link>
 
           <div className="flex items-center gap-4">
