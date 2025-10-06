@@ -155,11 +155,7 @@ export default function SyllabusPage({
             <h1 className="text-4xl font-bold text-black mb-2">
               Calendar Events
             </h1>
-            {syllabus && (
-              <p className="text-black/60">
-                Syllabus: {syllabus.original_filename}
-              </p>
-            )}
+  
 
             <div className="mt-4 flex items-center gap-2">
               <span className="text-sm text-black/60">View:</span>

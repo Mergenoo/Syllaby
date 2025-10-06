@@ -158,7 +158,7 @@ export default function UploadNewSyllabi({
     <div>
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`bg-black text-white px-3 py-1 rounded-md text-sm hover:bg-black/90 transition-colors ${className}`}
+        className={`bg-black cursor-pointer text-white px-3 py-1 rounded-md text-sm hover:bg-black/90 transition-colors ${className}`}
       >
         Upload Syllabus
       </button>
